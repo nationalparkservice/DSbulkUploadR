@@ -21,5 +21,10 @@ Useful links:
 \author{
 \strong{Maintainer}: Robert Baker \email{robert_baker@nps.gov} (\href{https://orcid.org/0000-0001-7591-5035}{ORCID})
 
+Authors:
+\itemize{
+  \item Robert Baker \email{robert_baker@nps.gov} (\href{https://orcid.org/0000-0001-7591-5035}{ORCID})
+}
+
 }
 \keyword{internal}
