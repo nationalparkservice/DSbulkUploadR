@@ -14,7 +14,6 @@ License: CC0 + file LICENSE
 BugReports: https://github.com/DOI-nps/DSbulkUploadR/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Imports: 
     cli,
     curl,
@@ -33,8 +32,9 @@ Imports:
     utils,
     XML
 Remotes:
-    nationalparkservice/NPSdatastore
+    doi-nps/NPSdatastore
 URL: https://github.com/DOI-nps/DSbulkUploadR, https://DOI-nps.github.io/DSbulkUploadR, https://DOI-nps.github.io/DSbulkUploadR/
 Config/Needs/website: rmarkdown
 Suggests: 
     rmarkdown
+Config/roxygen2/version: 8.0.0
