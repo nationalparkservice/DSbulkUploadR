@@ -1,4 +1,9 @@
 # DSbulkUploadR v1.1.1 (development version)
+## 2026-08-07
+  * Add support for content end date for Projects on DSbulkUploadR_input.xlsx
+  * Add support for missing content end dates for projects in `check_end_date` and `check_end_after_start`
+  * Update vignettes to describe how to use content end dates for projects without content end dates (leave blank!)
+
 ## 2026-05-08
   * Add github actions r-cmd-check
   
