@@ -194,6 +194,14 @@ generate_references <- function(path = getwd(),
                       content_units = links_to_add,
                       dev = dev)
 
+    # add producing units:
+    prod_units <- upload_data$producing_units[i]
+    NPSdatastore::add_producing_units(reference_id = ref_code,
+                                      nps_units = prod_units,
+                                      dev = dev,
+                                      interactive = FALSE)
+
+
     # add license information ----
     # set license type: wasn't working in set bibliography.. check to see if
     # that part of the API endpoint now works
