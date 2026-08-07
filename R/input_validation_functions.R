@@ -462,6 +462,11 @@ check_end_date <- function(path = getwd(),
     if (ref_type == "Project") {
       msg <- paste0('Not all references have content end dates.')
       cli::cli_warn(c("!" = msg))
+    } else {
+      msg <- paste0("Some content end dates are missing. Please supply ",
+                    "content end dates for all references in ISO-8601 ",
+                    "format.")
+      cli::cli_abort(c("x" = msg))
     }
   }
   #remove NA values
