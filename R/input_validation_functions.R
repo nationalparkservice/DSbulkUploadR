@@ -447,16 +447,28 @@ check_end_date <- function(path = getwd(),
                                                   filename),
                                     sheet = sheet_name)
 
-  end_dates <- suppressWarnings(upload_data$content_end_date)
+  end_dates <- upload_data$content_end_date
+
+  # when there are no dates at all, this is OK
   if (is.null(end_dates)) {
     msg <- paste0('All references of are type "', sheet_name, '" which does ',
                   'not require a content end date.')
     cli::cli_inform(c("v" = msg))
     return(invisible(NULL))
   }
-
+  # when there are some but not all end dates:
+  if (sum(is.na(end_dates)) > 0) {
+    ref_type <- upload_data$reference_type[1]
+    if (ref_type == "Project") {
+      msg <- paste0('Not all references have content end dates.')
+      cli::cli_warn(c("!" = msg))
+    }
+  }
+  #remove NA values
+  end_dates <- end_dates[!is.na(end_dates)]
+  #check remaining values for valid formatting:
   valid_dates <- !is.na(suppressWarnings(lubridate::ymd(end_dates)))
-  if (sum(valid_dates) < nrow(upload_data)) {
+  if (sum(valid_dates) < length(seq_along(end_dates))) {
     msg <- paste0("Some content end dates are not in ISO 8601 format ",
                   "(yyyy-mm-dd). Please supply all dates in ISO 8601 format.")
     cli::cli_abort(c("x" = msg))
