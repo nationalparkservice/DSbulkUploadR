@@ -60,6 +60,8 @@ The column content_begin_date in the input.xlsx file should contain the date tha
 ### Content end date
 The column content_end_date in the input.xlsx file should contain the date that the content of the reference/files ends in ISO 8601 format: YYYY-MM-DD. Other formats are not accepted. The content end date should be before today's date and after the content_start_date.
 
+Project reference types do not require content end dates. If your Project does not have a content end date, leave that cell blank: Do not enter "NA", "NULL" or any other missing value code. For all other reference types, if the column "content_end_date" is present you must supply a content end date for each reference. 
+
 ## Version (Script reference only)
 Provide the version number of the script of software being uploaded to DataStore, e.g. 1.0.0 or v0.0.1. The use of semantic versioning is highly recommended. NPS users can reference the section on [Semantic Versioning Guidance](https://doimspp.sharepoint.com/sites/nps-nrss-imdiv/data-publication/SitePages/Documenting-Code.aspx#what-do-i-call-my-releases-%28semantic-versioning-at-nps%29) in the Data Publication Best Practices SharePoint Site for further information.
 
