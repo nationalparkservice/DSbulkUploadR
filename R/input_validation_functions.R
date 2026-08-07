@@ -518,6 +518,7 @@ check_end_after_start <- function(path = getwd(),
   }
 
   time_dif <- lubridate::interval(start_dates, end_dates)
+  time_dif <- time_dif[!is.na(time_dif)]
   if (any(time_dif < 0)) {
     msg <- paste0("Some content end dates predate content start dates. ",
                   "Please make sure end dates are after start dates.")
