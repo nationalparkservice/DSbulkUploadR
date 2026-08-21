@@ -222,12 +222,12 @@ generate_references <- function(path = getwd(),
         }
         if (!is.na(upload_data$project_id[i])) {
           msg <- paste0("Adding reference {ref_code} to project ",
-                        "{upload_data$project[i].")
+                        "{upload_data$project_id[i]}.")
           cli::cli_inform(msg)
           projects_to_add <- unlist(stringr::str_split(upload_data$project_id[i],
                                                ", "))
           projects_to_add <- stringr::str_trim(projects_to_add)
-          for (j in 1: projects_to_add) {
+          for (j in seq_along(projects_to_add)) {
             if (!is.na(projects_to_add[j])) {
               add_ref_to_projects(reference_id = ref_code,
                                   project_id = projects_to_add[j],
@@ -257,7 +257,7 @@ generate_references <- function(path = getwd(),
       msg <- paste0("An incomplete reference, {ref_code}, has been created. ",
                     "This reference should not be activated and should be ",
                     "removed. In Datastore enter edit mode and click ",
-                    "deactivate\" at the bottom of the page.")
+                    "\"deactivate\" at the bottom of the page.")
       cli::cli_inform(msg)
       e  # return the error condition to the outer scope
     })
