@@ -117,7 +117,7 @@ generate_references <- function(path = getwd(),
                                        dev = dev)
     cli::cli_inform("Creating draft reference {ref_code}.")
     cli::cli_inform("Populating draft reference {ref_code}.")
-
+    cli::cli_inform("Writing Core Bibliography for {ref_code}.")
     write_core_bibliography(reference_id = ref_code,
                             filename = filename,
                             sheet_name = sheet,
@@ -125,6 +125,7 @@ generate_references <- function(path = getwd(),
                             path = path,
                             dev = dev)
     #set by-for-nps to TRUE
+    cli::cli_inform("Setting \"by or for NPS\" flag for {ref_code}.")
     NPSdatastore::set_by_for_nps(reference_id = ref_code,
                                  by_for_nps = TRUE,
                                  dev = dev,
@@ -160,9 +161,6 @@ generate_references <- function(path = getwd(),
       }
     }
 
-      #add reference id column to dataframe to make it easier to find them all
-    suppressWarnings(upload_data$reference_id[i] <- ref_code)
-
     # add keywords ----
     keywords_to_add <- unlist(stringr::str_split(upload_data$keywords[i],
                                          ", "))
@@ -186,6 +184,7 @@ generate_references <- function(path = getwd(),
     }
 
     # add content unit links ----
+    cli::cli_inform("Adding Content Unit Links to {ref_code}.")
     links_to_add <- unlist(stringr::str_split(upload_data$content_units[i],
                                               ", "))
     links_to_add <- stringr::str_trim(links_to_add)
@@ -194,7 +193,8 @@ generate_references <- function(path = getwd(),
                       content_units = links_to_add,
                       dev = dev)
 
-    # add producing units:
+    # add producing units; takes a single reference id and one or more unit codes
+    cli::cli_inform("Adding Producing Units to {ref_code}.")
     prod_units <- upload_data$producing_units[i]
     NPSdatastore::add_producing_units(reference_id = ref_code,
                                       nps_units = prod_units,
@@ -206,6 +206,7 @@ generate_references <- function(path = getwd(),
     # set license type: wasn't working in set bibliography.. check to see if
     # that part of the API endpoint now works
     # Last check:
+    cli::cli_inform("Setting license for {ref_code}.")
     NPSdatastore::set_license(reference_id = ref_code,
                               license_type_id = upload_data$license_code[i],
                               dev = dev,
@@ -217,6 +218,7 @@ generate_references <- function(path = getwd(),
         project_data$project_id[i] <- NA
       }
       if (!is.na(upload_data$project_id[i])) {
+        cli::cli_inform("Adding reference {ref_code} to project {upload_data$project[i].")
         projects_to_add <- unlist(stringr::str_split(upload_data$project_id[i],
                                                ", "))
         projects_to_add <- stringr::str_trim(projects_to_add)
@@ -231,6 +233,7 @@ generate_references <- function(path = getwd(),
     }
 
     # add editors to project (person uploading is also added as an editor) ----
+    cli::cli_inform("Adding editors to {ref_code}.")
     editors_to_add <- unlist(stringr::str_split(upload_data$editor_email_list[i],
                                                  ", "))
     editors_to_add <- stringr::str_trim(editors_to_add)
@@ -238,6 +241,9 @@ generate_references <- function(path = getwd(),
     add_editors(reference_id = ref_code,
                editor_list = editors_to_add,
                dev = dev)
+
+    #add reference id column to dataframe to make it easier to find them all
+    suppressWarnings(upload_data$reference_id[i] <- ref_code)
 
   }
   return(upload_data)
