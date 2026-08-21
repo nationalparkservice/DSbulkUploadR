@@ -447,16 +447,33 @@ check_end_date <- function(path = getwd(),
                                                   filename),
                                     sheet = sheet_name)
 
-  end_dates <- suppressWarnings(upload_data$content_end_date)
+  end_dates <- upload_data$content_end_date
+
+  # when there are no dates at all, this is OK
   if (is.null(end_dates)) {
     msg <- paste0('All references of are type "', sheet_name, '" which does ',
                   'not require a content end date.')
     cli::cli_inform(c("v" = msg))
     return(invisible(NULL))
   }
-
+  # when there are some but not all end dates:
+  if (sum(is.na(end_dates)) > 0) {
+    ref_type <- upload_data$reference_type[1]
+    if (ref_type == "Project") {
+      msg <- paste0('Not all references have content end dates.')
+      cli::cli_warn(c("!" = msg))
+    } else {
+      msg <- paste0("Some content end dates are missing. Please supply ",
+                    "content end dates for all references in ISO-8601 ",
+                    "format.")
+      cli::cli_abort(c("x" = msg))
+    }
+  }
+  #remove NA values
+  end_dates <- end_dates[!is.na(end_dates)]
+  #check remaining values for valid formatting:
   valid_dates <- !is.na(suppressWarnings(lubridate::ymd(end_dates)))
-  if (sum(valid_dates) < nrow(upload_data)) {
+  if (sum(valid_dates) < length(seq_along(end_dates))) {
     msg <- paste0("Some content end dates are not in ISO 8601 format ",
                   "(yyyy-mm-dd). Please supply all dates in ISO 8601 format.")
     cli::cli_abort(c("x" = msg))
@@ -501,6 +518,7 @@ check_end_after_start <- function(path = getwd(),
   }
 
   time_dif <- lubridate::interval(start_dates, end_dates)
+  time_dif <- time_dif[!is.na(time_dif)]
   if (any(time_dif < 0)) {
     msg <- paste0("Some content end dates predate content start dates. ",
                   "Please make sure end dates are after start dates.")
@@ -759,7 +777,12 @@ check_orcid_format <- function(path = getwd(),
   usr_email <- unique(usr_email)
   req_url <- paste0("https://irmadevservices.nps.gov/",
                     "adverification/v1/rest/lookup/email")
+
   bdy <- usr_email
+  if (length(seq_along(bdy)) < 2) {
+    bdy <- list(bdy)
+  }
+
   req <- httr::POST(req_url,
                     httr::add_headers('Content-Type' = 'application/json'),
                     body = rjson::toJSON(bdy))
@@ -1090,7 +1113,7 @@ check_content_units <- function(path = getwd(),
 
 #' Checks that Project IDs are numeric
 #'
-#' The function checks that all project IDs are numeric (or NA). If projects are all numeric (or NA), the test passes. Otherwise it fails with a warning.
+#' The function checks that all project IDs are numeric (or NA). If projects are all numeric (or NA), the test passes. Otherwise it fails with a warning. Test is passes unconditionally if reference type is a Project.
 #'
 #' @inheritParams check_ref_type
 #'
@@ -1104,6 +1127,12 @@ check_content_units <- function(path = getwd(),
 check_projects_numeric <- function(path = getwd(),
                            filename = "DSbulkUploadR_input.xlsx",
                            sheet_name) {
+
+  if (sheet_name == "Project") {
+    msg <- "Project IDs not required for Project reference types"
+    cli::cli_inform(c("v" = msg))
+    return(invisible(NULL))
+  }
 
   upload_data <- readxl::read_excel(path = paste0(path,
                                                   "/",
@@ -1137,7 +1166,7 @@ check_projects_numeric <- function(path = getwd(),
 
 #' Checks for valid projects
 #'
-#' The function Initiates an API call to datastore to make sure that a project is valid. Potential reasons for check to fail with an error include: The reference ID number does not go to a valid DataStore reference, the valid reference is not a Project type reference, the user not being on the VPN/on an NPS network, the project may not be public, the project may not be active, or the user may not have permissions to access or edit the project.
+#' The function Initiates an API call to datastore to make sure that a project is valid. Potential reasons for check to fail with an error include: The reference ID number does not go to a valid DataStore reference, the valid reference is not a Project type reference, the user not being on the VPN/on an NPS network, the project may not be public, the project may not be active, or the user may not have permissions to access or edit the project.This test passes unconditionally if the reference type is a Project.
 #'
 #' @inheritParams check_ref_type
 #' @param dev Logical. Whether or not the API calls should be made to the development (TRUE) or production (FALSE) server. Defaults to TRUE.
@@ -1157,6 +1186,12 @@ check_projects_valid <- function(path = getwd(),
                                                   "/",
                                                   filename),
                                     sheet = sheet_name)
+
+  if (sheet_name == "Project") {
+    msg <- "Project IDs not required for Project reference types"
+    cli::cli_inform(c("v" = msg))
+    return(invisible(NULL))
+  }
 
   projects <- NULL
   for (i in 1:nrow(upload_data)) {

@@ -33,7 +33,7 @@ Imports:
     XML
 Remotes:
     doi-nps/NPSdatastore
-URL: https://github.com/DOI-nps/DSbulkUploadR, https://DOI-nps.github.io/DSbulkUploadR, https://DOI-nps.github.io/DSbulkUploadR/
+URL: https://github.com/DOI-nps/DSbulkUploadR, https://DOI-nps.github.io/DSbulkUploadR/
 Config/Needs/website: rmarkdown
 Suggests: 
     rmarkdown

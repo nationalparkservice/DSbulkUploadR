@@ -228,6 +228,21 @@ write_core_bibliography <- function(reference_id,
                    licenseTypeID = upload_data$license_code[row_num]
     )
   } else if (upload_data$reference_type[row_num] == "Project") {
+    # end dates are optional
+    end_date <- upload_data$content_end_date[row_num]
+
+    if (!is.na(end_date)) {
+      proj_end_date <- list(year = lubridate::year(end_date),
+                       month = lubridate::month(end_date),
+                       day = lubridate::day(end_date),
+                       precision = "")
+    } else {
+      proj_end_date <- list(year = "null",
+                            month = "null",
+                            day = "null",
+                            precision = "")
+    }
+
     bib_body <- list(title = upload_data$title[row_num],
                    issuedDate = list(year = lubridate::year(today),
                                      month = lubridate::month(today),
@@ -237,7 +252,7 @@ write_core_bibliography <- function(reference_id,
                                            month = lubridate::month(begin_date),
                                            day = lubridate::day(begin_date),
                                            precision = ""),
-                   contentEndDate = "",
+                   contentEndDate = proj_end_date,
                    location = "Fort Collins, CO",
                    miscellaneousCode = "",
                    #volume = "",
@@ -285,7 +300,7 @@ write_core_bibliography <- function(reference_id,
     )
   }
 
-  bib_body <- rjson::toJSON(bib_body)
+  #bib_body <- rjson::toJSON(bib_body)
   #for testing purposes and to look at the json sent:
   #jsonlite::prettify(bib_body)
 
