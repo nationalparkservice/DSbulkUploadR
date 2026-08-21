@@ -35,7 +35,7 @@ generate_references <- function(path = getwd(),
     data_upload <- FALSE
   }
 
-  #check upload file validity: (temp turned off)
+  #check upload file validity:
   validation <- run_input_validation(filename = filename,
                                      path = path,
                                      sheet = sheet,
