@@ -11,6 +11,7 @@ generate_references(
   max_file_upload = 500,
   max_data_upload = 10,
   data_upload = TRUE,
+  max_tries = 3,
   dev = TRUE
 )
 }
@@ -26,6 +27,8 @@ generate_references(
 \item{max_data_upload}{Integer. The maximum allowable amount of data to upload (in GB). Defaults to 100.}
 
 \item{data_upload}{Logical. Defaults to TRUE. To create a bunch of draft reference but not upload any files to them, set the parameter \code{data_upload} to \code{FALSE}.}
+
+\item{max_tries}{Integer. Defaults to 3. The number of attempts that should be made to create and populate any one reference.}
 
 \item{dev}{Logical. Whether the reference creation/file uploads will occur on the development server (TRUE) or the production server (FALSE). Defaults to TRUE.}
 }

@@ -12,7 +12,6 @@ Efficiently creates, populates, and uploads files to multiple DataStore referenc
 Useful links:
 \itemize{
   \item \url{https://github.com/DOI-nps/DSbulkUploadR}
-  \item \url{https://DOI-nps.github.io/DSbulkUploadR}
   \item \url{https://DOI-nps.github.io/DSbulkUploadR/}
   \item Report bugs at \url{https://github.com/DOI-nps/DSbulkUploadR/issues}
 }

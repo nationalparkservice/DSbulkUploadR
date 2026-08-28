@@ -21,7 +21,7 @@ check_projects_numeric(
 NULL (invisibly)
 }
 \description{
-The function checks that all project IDs are numeric (or NA). If projects are all numeric (or NA), the test passes. Otherwise it fails with a warning.
+The function checks that all project IDs are numeric (or NA). If projects are all numeric (or NA), the test passes. Otherwise it fails with a warning. Test is passes unconditionally if reference type is a Project.
 }
 \examples{
 \dontrun{
