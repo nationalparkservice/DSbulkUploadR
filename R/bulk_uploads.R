@@ -14,6 +14,7 @@
 #' @param max_file_upload Integer. The maximum allowable number of files to upload. Defaults to 500.
 #' @param max_data_upload Integer. The maximum allowable amount of data to upload (in GB). Defaults to 100.
 #' @param data_upload Logical. Defaults to TRUE. To create a bunch of draft reference but not upload any files to them, set the parameter `data_upload` to `FALSE`.
+#' @param max_tries Integer. Defaults to 3. The number of attempts that should be made to create and populate any one reference.
 #' @param dev Logical. Whether the reference creation/file uploads will occur on the development server (TRUE) or the production server (FALSE). Defaults to TRUE.
 #'
 #' @returns Dataframe
@@ -28,6 +29,7 @@ generate_references <- function(path = getwd(),
                                 max_file_upload = 500,
                                 max_data_upload = 10,
                                 data_upload = TRUE,
+                                max_tries = 3,
                                 dev = TRUE) {
 
   #Projects cannot have data uploaded directly to them:
@@ -108,10 +110,9 @@ generate_references <- function(path = getwd(),
     return(invisible(NULL))
   }
 
-  #### Begin Claude rewrite: ####
   upload_data$reference_id <- NULL
 
-  max_retries <- 3
+  max_retries <- max_tries
   i <- 1
 
   while (i <= nrow(upload_data)) {
