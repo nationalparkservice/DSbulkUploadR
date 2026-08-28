@@ -24,7 +24,7 @@ check_projects_valid(
 NULL (invisibly)
 }
 \description{
-The function Initiates an API call to datastore to make sure that a project is valid. Potential reasons for check to fail with an error include: The reference ID number does not go to a valid DataStore reference, the valid reference is not a Project type reference, the user not being on the VPN/on an NPS network, the project may not be public, the project may not be active, or the user may not have permissions to access or edit the project.
+The function Initiates an API call to datastore to make sure that a project is valid. Potential reasons for check to fail with an error include: The reference ID number does not go to a valid DataStore reference, the valid reference is not a Project type reference, the user not being on the VPN/on an NPS network, the project may not be public, the project may not be active, or the user may not have permissions to access or edit the project.This test passes unconditionally if the reference type is a Project.
 }
 \examples{
 \dontrun{

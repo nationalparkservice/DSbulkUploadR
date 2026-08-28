@@ -14,6 +14,7 @@
 #' @param max_file_upload Integer. The maximum allowable number of files to upload. Defaults to 500.
 #' @param max_data_upload Integer. The maximum allowable amount of data to upload (in GB). Defaults to 100.
 #' @param data_upload Logical. Defaults to TRUE. To create a bunch of draft reference but not upload any files to them, set the parameter `data_upload` to `FALSE`.
+#' @param max_tries Integer. Defaults to 3. The number of attempts that should be made to create and populate any one reference.
 #' @param dev Logical. Whether the reference creation/file uploads will occur on the development server (TRUE) or the production server (FALSE). Defaults to TRUE.
 #'
 #' @returns Dataframe
@@ -23,12 +24,13 @@
 #' \dontrun{
 #' generate_references(sheet = "AudioRecording")}
 generate_references <- function(path = getwd(),
-                                      filename = "DSbulkUploadR_input.xlsx",
-                                      sheet,
-                                      max_file_upload = 500,
-                                      max_data_upload = 10,
-                                      data_upload = TRUE,
-                                      dev = TRUE) {
+                                filename = "DSbulkUploadR_input.xlsx",
+                                sheet,
+                                max_file_upload = 500,
+                                max_data_upload = 10,
+                                data_upload = TRUE,
+                                max_tries = 3,
+                                dev = TRUE) {
 
   #Projects cannot have data uploaded directly to them:
   if (sheet == "Project") {
@@ -52,9 +54,9 @@ generate_references <- function(path = getwd(),
     return()
   } else if (validation[2] > 0) {
     msg <- cat("The data validation process has identified",
-                  "warnings. Are you sure you want to proceed without",
-                  "addressing these warnings?","\n",
-                  "1: Yes", "\n","2: No","\n")
+               "warnings. Are you sure you want to proceed without",
+               "addressing these warnings?","\n",
+               "1: Yes", "\n","2: No","\n")
     cli::cli_inform(c("!" = msg))
     var1 <- readline(prompt= " ")
     if (var1 != 1) {
@@ -74,10 +76,10 @@ generate_references <- function(path = getwd(),
   if (data_upload == TRUE) {
     #calculate number of files to upload:
     file_num <- 0
-      for (i in 1:nrow(upload_data)) {
-        files_per_ref <- length(list.files(upload_data$file_path[i]))
-        file_num <- (file_num + files_per_ref)
-      }
+    for (i in 1:nrow(upload_data)) {
+      files_per_ref <- length(list.files(upload_data$file_path[i]))
+      file_num <- (file_num + files_per_ref)
+    }
 
     #calculate total file size to upload:
     file_size <- 0
@@ -91,9 +93,9 @@ generate_references <- function(path = getwd(),
     #ask to proceed; verify number of refs to create, files to upload, and total upload size:
 
     msg <- paste0("Would you like to upload all of your files and create ",
-                "{ref_count} new references on DataStore? This will ",
-                "involve uploading {file_num} files and ",
-                "{round(file_gb, 3)} GB of data.")
+                  "{ref_count} new references on DataStore? This will ",
+                  "involve uploading {file_num} files and ",
+                  "{round(file_gb, 3)} GB of data.")
     cli::cli_inform(msg)
   } else {
     # if data_upload is FALSE (no file uploads)
@@ -110,161 +112,194 @@ generate_references <- function(path = getwd(),
 
   upload_data$reference_id <- NULL
 
-  for (i in 1:nrow(upload_data)) {
-    # create draft reference ----
-    result <- tryCatch({
+  max_retries <- max_tries
+  i <- 1
 
-      ref_code <-
-        create_draft_reference(draft_title = upload_data$title[i],
-                               ref_type = upload_data$reference_type[i],
-                               dev = dev)
-      cli::cli_inform("Creating draft reference {ref_code}.")
-      cli::cli_inform("Populating draft reference {ref_code}.")
-      cli::cli_inform("Writing Core Bibliography for {ref_code}.")
-      write_core_bibliography(reference_id = ref_code,
-                              filename = filename,
-                              sheet_name = sheet,
-                              row_num = i,
-                              path = path,
-                              dev = dev)
-      #set by-for-nps to TRUE
-      cli::cli_inform("Setting \"by or for NPS\" flag for {ref_code}.")
-      NPSdatastore::set_by_for_nps(reference_id = ref_code,
-                                   by_for_nps = TRUE,
-                                   dev = dev,
-                                   interactive = FALSE)
+  while (i <= nrow(upload_data)) {
 
-      # upload files to reference ----
-      # don't upload if data_upload == FALSE
-      if (data_upload == TRUE) {
+    attempt <- 1
+    success <- FALSE
 
-        #translate 508compliance:
-        compliant <- NULL
-        if (upload_data$files_508_compliant[i] == "yes") {
-          compliant <- TRUE
-        } else {
-          compliant <- FALSE
+    while (attempt <= max_retries && !success) {
+      ref_code <- NULL  # reset each attempt so cleanup doesn't use a stale value
+      result <- tryCatch({
+        # create draft reference ----
+
+        ref_code <-
+          NPSdatastore::create_draft_reference(title = upload_data$title[i],
+                                               reference_type_code =
+                                                 upload_data$reference_type[i],
+                                               date_published = Sys.Date(),
+                                               dev = dev)$referenceCode
+        cli::cli_inform("{.strong Draft reference {ref_code} created.}")
+        cli::cli_inform("Populating draft reference {ref_code}.")
+        cli::cli_inform("Writing Core Bibliography for {ref_code}.")
+        write_core_bibliography(reference_id = ref_code,
+                                filename = filename,
+                                sheet_name = sheet,
+                                row_num = i,
+                                path = path,
+                                dev = dev)
+        #set by-for-nps to TRUE
+        cli::cli_inform("Setting \"by or for NPS\" flag for {ref_code}.")
+        NPSdatastore::set_by_for_nps(reference_id = ref_code,
+                                     by_for_nps = TRUE,
+                                     dev = dev,
+                                     interactive = FALSE)
+
+        # upload files to reference ----
+        # don't upload if data_upload == FALSE
+        if (data_upload == TRUE) {
+
+          #translate 508compliance:
+          compliant <- NULL
+          if (upload_data$files_508_compliant[i] == "yes") {
+            compliant <- TRUE
+          } else {
+            compliant <- FALSE
+          }
+
+          file_list <- list.files(path = upload_data$file_path[i],
+                                  full.names = TRUE)
+
+          for (j in 1:length(file_list)) {
+            msg <- paste0("Uploading file {j} of {length(file_list)} to ",
+                          "reference {ref_code}.")
+            cli::cli_inform(msg)
+            suppressWarnings(upload_files(
+              filename = list.files(upload_data$file_path[i])[j],
+              path = upload_data$file_path[i],
+              reference_id = ref_code,
+              is_508 = compliant,
+              chunk_size_mb = 1,
+              retry = 1,
+              dev = dev))
+          }
         }
 
-        file_list <- list.files(path = upload_data$file_path[i],
-                              full.names = TRUE)
+        # add keywords ----
+        keywords_to_add <- unlist(stringr::str_split(upload_data$keywords[i],
+                                                     ", "))
+        keywords_to_add <- stringr::str_trim(keywords_to_add)
 
-        for (j in 1:length(file_list)) {
-          msg <- paste0("Uploading file {j} of {length(file_list)} to ",
-                        "reference {ref_code}.")
-          cli::cli_inform(msg)
-          suppressWarnings(upload_files(
-            filename = list.files(upload_data$file_path[i])[j],
-            path = upload_data$file_path[i],
-            reference_id = ref_code,
-            is_508 = compliant,
-            chunk_size_mb = 1,
-            retry = 1,
-            dev = dev))
+        cli::cli_inform("Adding keywords to reference {ref_code}.")
+        replace_keywords(reference_id = ref_code,
+                         keywords = keywords_to_add,
+                         dev = dev)
+
+        #Items under FieldNotes in the input.xlsx are treated as GenericDocuments
+        #as "field notes" is not a real DataStore reference type.
+        #per management decision the keyword "FieldNotes" added to the
+        #GenericDocument so that it can be triaged later
+        #good luck, future triage team!
+        if (upload_data$reference_type[i] == "FieldNotes") {
+          NPSdatastore::add_keywords(reference_id = ref_code,
+                                     keywords = "FieldNotes",
+
+                                     dev = dev,
+                                     interactive = FALSE)
         }
-      }
 
-      # add keywords ----
-      keywords_to_add <- unlist(stringr::str_split(upload_data$keywords[i],
-                                         ", "))
-      keywords_to_add <- stringr::str_trim(keywords_to_add)
+        # add content unit links ----
+        cli::cli_inform("Adding Content Unit Links to {ref_code}.")
+        links_to_add <- unlist(stringr::str_split(upload_data$content_units[i],
+                                                  ", "))
+        links_to_add <- stringr::str_trim(links_to_add)
 
-      cli::cli_inform("Adding keywords to reference {ref_code}.")
-      replace_keywords(reference_id = ref_code,
-                 keywords = keywords_to_add,
-                 dev = dev)
+        set_content_units(reference_id = ref_code,
+                          content_units = links_to_add,
+                          dev = dev)
 
-      #Items under FieldNotes in the input.xlsx are treated as GenericDocuments
-      #as "field notes" is not a real DataStore reference type.
-      #per management decision the keyword "FieldNotes" added to the
-      #GenericDocument so that it can be triaged later
-      #good luck, future triage team!
-      if (upload_data$reference_type[i] == "FieldNotes") {
-        NPSdatastore::add_keywords(reference_id = ref_code,
-                                   keywords = "FieldNotes",
-                                   dev = dev,
-                                   interactive = FALSE)
-      }
-
-      # add content unit links ----
-      cli::cli_inform("Adding Content Unit Links to {ref_code}.")
-      links_to_add <- unlist(stringr::str_split(upload_data$content_units[i],
+        # add producing units; takes a single reference id and one or more unit codes
+        cli::cli_inform("Adding Producing Units to {ref_code}.")
+        prod_units <- unlist(stringr::str_split(upload_data$producing_units[i],
                                                 ", "))
-      links_to_add <- stringr::str_trim(links_to_add)
-
-      set_content_units(reference_id = ref_code,
-                        content_units = links_to_add,
-                        dev = dev)
-
-      # add producing units; takes a single reference id and one or more unit codes
-      cli::cli_inform("Adding Producing Units to {ref_code}.")
-      prod_units <- upload_data$producing_units[i]
-      NPSdatastore::add_producing_units(reference_id = ref_code,
-                                        nps_units = prod_units,
-                                        dev = dev,
-                                        interactive = FALSE)
-
-
-      # add license information ----
-      # set license type: wasn't working in set bibliography.. check to see if
-      # that part of the API endpoint now works
-      # Last check:
-      cli::cli_inform("Setting license for {ref_code}.")
-      NPSdatastore::set_license(reference_id = ref_code,
-                                license_type_id = upload_data$license_code[i],
-                                dev = dev,
-                                interactive = FALSE)
-
-      # add reference to project(s) (but NOT if the ref IS a project) ----
-      if (upload_data$reference_type[i] != "Project") {
-        if(upload_data$project_id[i] == "NA") {
-          project_data$project_id[i] <- NA
+        prod_units <- stringr::str_trim(prod_units)
+        for(l in seq_along(prod_units)) {
+          NPSdatastore::add_producing_units(reference_id = ref_code,
+                                            nps_units = prod_units[l],
+                                            dev = dev,
+                                            interactive = FALSE)
         }
-        if (!is.na(upload_data$project_id[i])) {
-          msg <- paste0("Adding reference {ref_code} to project ",
-                        "{upload_data$project_id[i]}.")
-          cli::cli_inform(msg)
-          projects_to_add <- unlist(stringr::str_split(upload_data$project_id[i],
-                                               ", "))
-          projects_to_add <- stringr::str_trim(projects_to_add)
-          for (j in seq_along(projects_to_add)) {
-            if (!is.na(projects_to_add[j])) {
-              add_ref_to_projects(reference_id = ref_code,
-                                  project_id = projects_to_add[j],
-                                  dev = dev)
+
+        # add license information ----
+        cli::cli_inform("Setting license for {ref_code}.")
+        NPSdatastore::set_license(reference_id = ref_code,
+                                  license_type_id = upload_data$license_code[i],
+                                  dev = dev,
+                                  interactive = FALSE)
+
+        # add reference to project(s) (but NOT if the ref IS a project) ----
+        if (upload_data$reference_type[i] != "Project") {
+          if(upload_data$project_id[i] == "NA") {
+            upload_data$project_id[i] <- NA
+          }
+          if (!is.na(upload_data$project_id[i])) {
+            msg <- paste0("Adding reference {ref_code} to project ",
+                          "{upload_data$project_id[i]}.")
+            cli::cli_inform(msg)
+            projects_to_add <- unlist(stringr::str_split(
+              upload_data$project_id[i], ", "))
+            projects_to_add <- stringr::str_trim(projects_to_add)
+            for (k in seq_along(projects_to_add)) {
+              if (!is.na(projects_to_add[k])) {
+                add_ref_to_projects(reference_id = ref_code,
+                                    project_id = projects_to_add[k],
+                                    dev = dev)
+              }
             }
           }
         }
+
+        # add editors to project (person uploading is also added as an editor) ----
+        cli::cli_inform("Adding editors to {ref_code}.")
+        editors_to_add <- unlist(stringr::str_split(
+          upload_data$editor_email_list[i],", "))
+        editors_to_add <- stringr::str_trim(editors_to_add)
+
+        add_editors(reference_id = ref_code,
+                    editor_list = editors_to_add,
+                    dev = dev)
+
+        #add reference id column to dataframe to make it easier to find them all
+        suppressWarnings(upload_data$reference_id[i] <- ref_code)
+
+        NULL  # explicit success sentinel
+
+      }, error = function(e) {
+        msg <- paste0("API call failed on iteration {i}, attempt {attempt} ",
+                      "of {max_retries} (reference: ",
+                      "{upload_data$title[i]}): {conditionMessage(e)}")
+        cli::cli_inform(msg)
+        e  # return the error condition to the outer scope
+      })
+      if (is.null(result)) {
+        # iteration succeeded
+        success <- TRUE
+      } else {
+        # clean up the partially-created reference, if one was created
+        if (!is.null(ref_code)) {
+          NPSdatastore::delete_inactive_ref(reference_id = ref_code,
+                                            dev = dev,
+                                            interactive = FALSE)
+          msg <- paste0("{.strong Removed incomplete reference, {ref_code}.}")
+          cli::cli_inform(msg)
+        }
+        if (attempt < max_retries) {
+          msg <- paste0("Retrying iteration {i} (attempt ",
+                        "{attempt + 1} of {max_retries}).")
+          cli::cli_inform(msg)
+        }
+        attempt <- attempt + 1
       }
-
-      # add editors to project (person uploading is also added as an editor) ----
-      cli::cli_inform("Adding editors to {ref_code}.")
-      editors_to_add <- unlist(stringr::str_split(upload_data$editor_email_list[i],
-                                                 ", "))
-      editors_to_add <- stringr::str_trim(editors_to_add)
-
-      add_editors(reference_id = ref_code,
-                  editor_list = editors_to_add,
-                  dev = dev)
-
-      #add reference id column to dataframe to make it easier to find them all
-      suppressWarnings(upload_data$reference_id[i] <- ref_code)
-
-
-    }, error = function(e) {
-      cli::cli_inform("API call failed on iteration {i} (reference: {upload_data$title[i]}): {conditionMessage(e)}")
-      cli::cli_inform("Stopping bulk upload. Returning data completed so far.")
-      msg <- paste0("An incomplete reference, {ref_code}, has been created. ",
-                    "This reference should not be activated and should be ",
-                    "removed. In Datastore enter edit mode and click ",
-                    "\"deactivate\" at the bottom of the page.")
+    }
+    if (!success) {
+      msg <- paste0("Iteration {i} failed after {max_retries} attempts. ",
+                    "Exiting the function.")
       cli::cli_inform(msg)
-      e  # return the error condition to the outer scope
-    })
-
-    # if an error occurred, stop the loop and return what we have
-    if (!is.null(result)) {
       return(upload_data)
     }
+    i <- i + 1
   }
+  return(upload_data)
 }

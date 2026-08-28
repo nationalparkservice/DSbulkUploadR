@@ -85,6 +85,7 @@
 <span>  max_file_upload <span class="op">=</span> <span class="fl">500</span>,</span>
 <span>  max_data_upload <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  data_upload <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  max_tries <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  dev <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -115,6 +116,10 @@
 
 <dt id="arg-data-upload">data_upload<a class="anchor" aria-label="anchor" href="#arg-data-upload"></a></dt>
 <dd><p>Logical. Defaults to TRUE. To create a bunch of draft reference but not upload any files to them, set the parameter <code>data_upload</code> to <code>FALSE</code>.</p></dd>
+
+
+<dt id="arg-max-tries">max_tries<a class="anchor" aria-label="anchor" href="#arg-max-tries"></a></dt>
+<dd><p>Integer. Defaults to 3. The number of attempts that should be made to create and populate any one reference.</p></dd>
 
 
 <dt id="arg-dev">dev<a class="anchor" aria-label="anchor" href="#arg-dev"></a></dt>
