@@ -16,7 +16,8 @@
 activate_references <- function(reference_id,
                                 dev = TRUE) {
   df <- NULL
-  for (i in 1:reference_id) {
+  for (i in seq_along(reference_id)) {
+    problem <- NA
     pre_lifecycle <- NPSdatastore::get_lifecycle_info(reference_id[i],
                                                       dev = dev)
     pre_lifecycle <- pre_lifecycle$lifecycle
@@ -26,23 +27,23 @@ activate_references <- function(reference_id,
         NPSdatastore::set_lifecycle_active(reference_id[i],
                                        dev = dev,
                                        interactive = FALSE)
-        problem <- "no"
+        problem <<- "no"
       }, error = function(e) {
         msg <- paste0("Reference ", reference_id[i], " could not be activated.",
                       " Make sure you are connected to the VPN and that all ",
                       "the required fields for activating the reference are ",
                       "complete.")
         cli::cli_warn(c("!" = msg))
-        problem <- "yes"
+        problem <<- "yes"
       })
     } else {
-      problems <- "no lifecycle change made"
+      problem <- "no lifecycle change made"
     }
     post_lifecycle <- NPSdatastore::get_lifecycle_info(reference_id[i],
                                                        dev = dev)
     post_lifecycle <- post_lifecycle$lifecycle
 
-    df <- rbind(reference_id[i], pre_lifecycle, post_lifecycle, problem)
+    df <- rbind(df, c(reference_id[i], pre_lifecycle, post_lifecycle, problem))
   }
   colnames(df) <- c("reference_id", "start_lifecycle",
                     "current_lifecycle", "errors")
