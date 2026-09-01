@@ -17,16 +17,17 @@ The `DSbulkUploadR` package only requires using two R functions:
 1) Data validation
 3) Create draft reference(s) on DataStore
 4) Populate each draft reference with the supplied information
-5) Upload **all** the file(s) in the specified directory to the draft reference(s)
+5) Optionally, upload **all** the file(s) in the specified directory to the draft reference(s)
 6) Connect your reference to a pre-existing DataStore Project reference
+7) Optionally, activate each reference
 
-The `generate_references()` will return a dataframe containing all of the information supplied in the input .xlsx file with one additional column containing the datastore reference ID for each newly created reference. You may wish to write this dataframe to a .csv, .txt, or similar for your records.
+The `generate_references()` will invisibly return a dataframe containing all of the information supplied in the input .xlsx file with two additional columns containing the datastore reference ID for each newly created reference and the status of the newly created reference ("draft" or "active"). You may wish to write this dataframe to a .csv, .txt, or similar for your records.
 
-After creating the references, you may wish to activate them. To do this, use the reference IDs within the dataframe returned by `generate_references` as the input for the `activate_references` function. Ensure that the references have received the appropriate level of review **before** you activate them.
+Should you choose to leave references in a draft status using `generate_references` (for instance to provide an opportunity for review prior to publication) you can subsequently and independently activate them by passing the reference ids in the resulting data frame to the `activate_references` function.
 
 # What this Package Doesn't
 1) Connect to the VPN or to the NPS network for you (you must be connected to the network to use these functions)
-2) Register ORCiDs for authors
+2) Register ORCiDs for authors.
 3) Add an author's ORCID to their Active Directory/Entra ID account
 4) Provide peer, technical, administrative, or other review of the reference(s) created
 5) Add taxonomy to the reference(s)

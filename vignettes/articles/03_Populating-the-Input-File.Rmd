@@ -60,7 +60,7 @@ The column content_begin_date in the input.xlsx file should contain the date tha
 ### Content end date
 The column content_end_date in the input.xlsx file should contain the date that the content of the reference/files ends in ISO 8601 format: YYYY-MM-DD. Other formats are not accepted. The content end date should be before today's date and after the content_start_date.
 
-Project reference types do not require content end dates. If your Project does not have a content end date, leave that cell blank: Do not enter "NA", "NULL" or any other missing value code. For all other reference types, if the column "content_end_date" is present you must supply a content end date for each reference. 
+Project reference types do not require content end dates. If your Project does not have a content end date, leave that cell blank: *Do not enter "NA", "NULL" or any other missing value code*. For all other reference types, if the column "content_end_date" is present you must supply a content end date for each reference. 
 
 ## Version (Script reference only)
 Provide the version number of the script of software being uploaded to DataStore, e.g. 1.0.0 or v0.0.1. The use of semantic versioning is highly recommended. NPS users can reference the section on [Semantic Versioning Guidance](https://doimspp.sharepoint.com/sites/nps-nrss-imdiv/data-publication/SitePages/Documenting-Code.aspx#what-do-i-call-my-releases-%28semantic-versioning-at-nps%29) in the Data Publication Best Practices SharePoint Site for further information.
@@ -86,7 +86,7 @@ The web address of the resource.
 ## Author email addresses
 The author_email_list column in input.xlsx should contain a comma-separated list of all the authors' email addresses. Use full email addresses rather than user names (e.g. first_last@nps.gov not FMLast@nps.gov). All references require at least one author. Do not include extra text (no quotations, angle brackets, etc). 
 
-All authors must be valid NPS employees or partners (e.g. @nps.gov, @partner.nps.gov). All authors must have registered an ORCiD and added the ORCiD to active directory/Entra ID. The ORCiD in Active Directory/Entra ID must have the format xxxx-xxxx-xxxx-xxxx.
+All authors must be valid NPS employees or partners (e.g. @nps.gov, @partner.nps.gov). All authors must have registered an ORCiD and have added the ORCiD to active directory/Entra ID. The ORCiD in Active Directory/Entra ID must have the format xxxx-xxxx-xxxx-xxxx.
 
 [Open Researcher and Contributor ID (ORCiD)](https://info.orcid.org/what-is-orcid/) is a third-party persistent digital identifier associated with individuals rather than institutions or documents. ORCiDs are required for authors by the [NPS Open Access Plan](https://irma.nps.gov/DataStore/DownloadFile/717695) for all authors of all scholarly and scientific work. You can learn more about ORCiDs, how register them, add them to Active Directory/Entra ID, control the automated information flowing to your ORCiD profile and what information orcid.org displays about you on the [NPS Data Publication Best Practices SharePoint site page on Persistent Identifiers](https://doimspp.sharepoint.com/sites/nps-nrss-imdiv/data-publication/SitePages/Reserve-a-DOI.aspx#personal-digital-identifiers-%28orcids%29) including ORCiDs.
 
@@ -162,7 +162,7 @@ Please enter an email address to contact about the CUI restrictions. It does not
 The column producing_unit in the input.xlsx file should contain a comma-separated list of acronyms for the NPS units that contributed to producing the reference or its content. For instance, an IMD network or region might be responsible for creating a reference or its content (e.g. IMR or ROMN). These must be valid NPS unit acronyms, e.g. ROMO not RMNP for Rocky Mountain National Park or IMD for the Inventory and Monitoring Division (not IM&D). 
 
 ## Content Unit(s)
-The column content_units in the input.xlsx file should contain a comma-separated list of acronyms for the NPS unit(s) where the information in the reference was collected or generated. These should be specific park units that have physical geographies and not organizational units. For instance, YELL (for Yellowstone) and/or GRTE (Grand Teton National Park) but *not* GRYN (Greater Yellowstone Network), IMD (Inventory and Monitoring Division), and not NRSS (Natural Resources Science and Stewardship Directorate), etc.
+The column content_units in the input.xlsx file should contain a comma-separated list of acronyms for the NPS unit(s) where the information in the reference was collected or generated. These should be specific park units that have physical geographies and not organizational units. For instance, YELL (for Yellowstone) and/or GRTE (Grand Teton National Park) but *not* GRYN (Greater Yellowstone Network), *not* IMD (Inventory and Monitoring Division), and *not* NRSS (Natural Resources Science and Stewardship Directorate), etc.
 
 ## Keywords
 The keywords column in the input.xlsx file should contain a comma-separated list of keywords to be added to the reference. Each keyword can consist of a single word or multiple words but should not contain special characters (e.g. no quotes, apostrophes, etc). Keywords will automatically be sorted into alphabetical order on DataStore.
