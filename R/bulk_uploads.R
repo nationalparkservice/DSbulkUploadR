@@ -11,6 +11,7 @@
 #' @param path String. Path to the file.
 #' @param filename String. The name of the file with information on what will be uploaded. Defaults to "DSbulkUploadR_input.xlsx". Must be an xlsx.
 #' @param sheet String. Name of the sheet within the .xlsx to read data from.
+#' @param activate_references Logical. Should the references be set to active or left in draft status? Defaults to FALSE (draft status)
 #' @param max_file_upload Integer. The maximum allowable number of files to upload. Defaults to 500.
 #' @param max_data_upload Integer. The maximum allowable amount of data to upload (in GB). Defaults to 100.
 #' @param data_upload Logical. Defaults to TRUE. To create a bunch of draft reference but not upload any files to them, set the parameter `data_upload` to `FALSE`.
@@ -26,6 +27,7 @@
 generate_references <- function(path = getwd(),
                                 filename = "DSbulkUploadR_input.xlsx",
                                 sheet,
+                                activate_refs = FALSE,
                                 max_file_upload = 500,
                                 max_data_upload = 10,
                                 data_upload = TRUE,
@@ -110,7 +112,24 @@ generate_references <- function(path = getwd(),
     return(invisible(NULL))
   }
 
+  if (activate_refs) {
+    msg <- paste0("are you sure you want to activate all {ref_count} newly ",
+                "created references?")
+    cli::cli_inform(msg)
+    var3 <- readline(prompt = "1: Yes\n2: No\n ")
+      if (var3 != 1) {
+        activate_refs <- FALSE
+      }
+  }
+
+  if (activate_refs) {
+    cli::cli_inform("{ref_count} references will be activated.")
+  } else {
+    cli::cli_inform("References will not be activated.")
+  }
+  #set up extra columns for data return:
   upload_data$reference_id <- NULL
+  upload_data$status <- NULL
 
   max_retries <- max_tries
   i <- 1
@@ -261,8 +280,19 @@ generate_references <- function(path = getwd(),
                     editor_list = editors_to_add,
                     dev = dev)
 
+        # activate the references, if appropriate:
+        if (activate_refs) {
+          activate_references(reference_id = ref_code,
+                              dev = dev)
+          upload_data$status[i] <- "active"
+        } else {
+          upload_data$status[i] <- "draft"
+        }
+
         #add reference id column to dataframe to make it easier to find them all
         suppressWarnings(upload_data$reference_id[i] <- ref_code)
+
+
 
         NULL  # explicit success sentinel
 
@@ -301,5 +331,6 @@ generate_references <- function(path = getwd(),
     }
     i <- i + 1
   }
+
   return(upload_data)
 }
