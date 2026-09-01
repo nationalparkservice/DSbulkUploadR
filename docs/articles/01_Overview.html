@@ -116,22 +116,23 @@ consists of:</p>
 <li>Data validation</li>
 <li>Create draft reference(s) on DataStore</li>
 <li>Populate each draft reference with the supplied information</li>
-<li>Upload <strong>all</strong> the file(s) in the specified directory
-to the draft reference(s)</li>
+<li>Optionally, upload <strong>all</strong> the file(s) in the specified
+directory to the draft reference(s)</li>
 <li>Connect your reference to a pre-existing DataStore Project
 reference</li>
+<li>Optionally, activate each reference</li>
 </ol>
-<p>The <code><a href="../reference/generate_references.html">generate_references()</a></code> will return a dataframe
-containing all of the information supplied in the input .xlsx file with
-one additional column containing the datastore reference ID for each
-newly created reference. You may wish to write this dataframe to a .csv,
-.txt, or similar for your records.</p>
-<p>After creating the references, you may wish to activate them. To do
-this, use the reference IDs within the dataframe returned by
-<code>generate_references</code> as the input for the
-<code>activate_references</code> function. Ensure that the references
-have received the appropriate level of review <strong>before</strong>
-you activate them.</p>
+<p>The <code><a href="../reference/generate_references.html">generate_references()</a></code> will invisibly return a
+dataframe containing all of the information supplied in the input .xlsx
+file with two additional columns containing the datastore reference ID
+for each newly created reference and the status of the newly created
+reference (“draft” or “active”). You may wish to write this dataframe to
+a .csv, .txt, or similar for your records.</p>
+<p>Should you choose to leave references in a draft status using
+<code>generate_references</code> (for instance to provide an opportunity
+for review prior to publication) you can subsequently and independently
+activate them by passing the reference ids in the resulting data frame
+to the <code>activate_references</code> function.</p>
 </div>
 <div class="section level2">
 <h2 id="what-this-package-doesnt">What this Package Doesn’t<a class="anchor" aria-label="anchor" href="#what-this-package-doesnt"></a>
@@ -139,7 +140,7 @@ you activate them.</p>
 <ol style="list-style-type: decimal">
 <li>Connect to the VPN or to the NPS network for you (you must be
 connected to the network to use these functions)</li>
-<li>Register ORCiDs for authors</li>
+<li>Register ORCiDs for authors.</li>
 <li>Add an author’s ORCID to their Active Directory/Entra ID
 account</li>
 <li>Provide peer, technical, administrative, or other review of the
