@@ -123,9 +123,9 @@ generate_references <- function(path = getwd(),
   }
 
   if (activate_refs) {
-    cli::cli_inform("{ref_count} references will be activated.")
+    cli::cli_inform("{ref_count} references will be activated.\n")
   } else {
-    cli::cli_inform("References will not be activated.")
+    cli::cli_inform("References will not be activated.\n")
   }
   #set up extra columns for data return:
   upload_data$reference_id <- NULL
