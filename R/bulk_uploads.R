@@ -295,8 +295,6 @@ generate_references <- function(path = getwd(),
         #add reference id column to dataframe to make it easier to find them all
         suppressWarnings(upload_data$reference_id[i] <- ref_code)
 
-
-
         NULL  # explicit success sentinel
 
       }, error = function(e) {
@@ -334,6 +332,5 @@ generate_references <- function(path = getwd(),
     }
     i <- i + 1
   }
-
   return(upload_data)
 }
