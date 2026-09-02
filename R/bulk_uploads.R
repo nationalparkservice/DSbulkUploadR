@@ -115,7 +115,7 @@ generate_references <- function(path = getwd(),
   }
 
   if (activate_refs) {
-    msg <- c(paste0("are you sure you want to activate all {ref_count} newly ",
+    msg <- c(paste0("Are you sure you want to activate all {ref_count} newly ",
                 "created references?"), "",
                 " 1: Yes"," 2: No","")
     cli::cli_inform(msg)
