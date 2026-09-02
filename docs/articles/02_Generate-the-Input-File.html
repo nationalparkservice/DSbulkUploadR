@@ -114,8 +114,11 @@ These validation steps are meant to help minimize inadvertent misuse of
 the functions but they cannot take the place of careful human
 inspection. Please make sure your input file is properly specified.</p>
 <p>We strongly recommend testing (a subset of?) your input file on the
-development server by setting the parameter <code>dev = TRUE</code> when
-using the <code><a href="../reference/generate_references.html">generate_references()</a></code> function.</p>
+development server by leaving the <code>dev</code> parameter in its
+default status (<code>dev = TRUE</code>) when first using the
+<code><a href="../reference/generate_references.html">generate_references()</a></code> function. Once you are satisfied with
+the results, you can set <code>dev = FALSE</code> to perform the
+operations on the DataStore’s production server.</p>
 </div>
 <div class="section level2">
 <h2 id="create-an-input-template">Create an input template<a class="anchor" aria-label="anchor" href="#create-an-input-template"></a>
@@ -127,12 +130,12 @@ file for each reference type you plan to upload to DataStore. Do not
 change the names of the sheets.</p>
 <p>To create the template input file, use the function
 <code><a href="../reference/write_input_template.html">write_input_template()</a></code>. For example, the following line of
-code</p>
+code:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/write_input_template.html">write_input_template</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>will write the file “DSbulkUploadR_input.xlsx” to your current
 working directory (you can customize where the file is written to by
-specifying the write_path).</p>
+specifying the <code>write_path</code>).</p>
 <p>For a full list of all available reference types on DataStore, see
 the swagger documentation for the <a href="https://irmaservices.nps.gov/datastore-secure/v7/documentation/datastore-secure-api.html#/Lookup%20Lists/FixedList_GetReferenceTypes" class="external-link">DataStore
 ReferenceTypes API</a> and example code.</p>
@@ -153,9 +156,10 @@ Audio Recording references and 51 Generic Document references, you will
 need to put the Audio Recording data in the AudioRecording sheet and the
 Generic Document data in the GenericDocument sheet of the
 DSbulkUploadR_input.xlsx file. You will also need to run the
-<code><a href="../reference/generate_references.html">generate_references()</a></code> function twice: once supplying the
-AudioRecording sheet and once supplying the GenericDocument sheet for
-the DSbulkdUploadR_input.xlsx file.</p>
+<code><a href="../reference/generate_references.html">generate_references()</a></code> function twice: once supplying with
+the <code>sheet</code> parameter set to “AudioRecording” and a second
+time with <code>sheet = "GenericDocument"</code>. You can use a single
+for the DSbulkdUploadR_input.xlsx file for both sheets.</p>
 </div>
   </div>
 

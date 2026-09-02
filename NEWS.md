@@ -1,4 +1,11 @@
 # DSbulkUploadR v1.1.1 (development version)
+## 2026-09-01
+  * Update `generate_bulk_references` console output
+  * Add ability to activate references directly from `generate_bulk_references`
+  * Updated `activate_references` to accept a column from a dataframe as input
+  * Update the dataframe output by `generate_bulk_references` to include the newly created reference status (active/draft)
+  * Update documentation to reflect changes to `activate_references` and `generate_bulk_references`
+  
 ## 2026-08-27
   * Add support to `generate_bulk_references` for API errors and to clean up incomplete draft references
   

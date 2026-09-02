@@ -12,18 +12,18 @@ knitr::opts_chunk$set(
 # Overview
 Carefully constructing and inspecting the input file is very important. The `generate_references()` function will run a series of data validation steps to make sure your input file is properly formatted. Any errors generated during input data validation will need to be fixed before any references are created or files are uploaded. These validation steps are meant to help minimize inadvertent misuse of the functions but they cannot take the place of careful human inspection. Please make sure your input file is properly specified. 
 
-We strongly recommend testing (a subset of?) your input file on the development server by setting the parameter `dev = TRUE` when using the `generate_references()` function.
+We strongly recommend testing (a subset of?) your input file on the development server by leaving the `dev` parameter in its default status (`dev = TRUE`) when first using the `generate_references()` function. Once you are satisfied with the results, you can set `dev = FALSE` to perform the operations on the DataStore's production server.
 
 # Create an input template
 Each DataStore reference type has a potentially unique backend storage system and potentially unique set of possible fields. Therefore you will need to use a separate sheet within the input.xlsx template file for each reference type you plan to upload to DataStore. Do not change the names of the sheets.
 
-To create the template input file, use the function `write_input_template()`. For example, the following line of code
+To create the template input file, use the function `write_input_template()`. For example, the following line of code:
 
 ```{r eval=FALSE}
 write_input_template()
 ```
 
-will write the file "DSbulkUploadR_input.xlsx" to your current working directory (you can customize where the file is written to by specifying the write_path).
+will write the file "DSbulkUploadR_input.xlsx" to your current working directory (you can customize where the file is written to by specifying the `write_path`).
 
 
 For a full list of all available reference types on DataStore, see the swagger documentation for the [DataStore ReferenceTypes API](https://irmaservices.nps.gov/datastore-secure/v7/documentation/datastore-secure-api.html#/Lookup%20Lists/FixedList_GetReferenceTypes) and example code.
@@ -31,4 +31,4 @@ For a full list of all available reference types on DataStore, see the swagger d
 # Implications of unique reference attributes
 Because each reference type on DataStore is unique with its own unique backend storage structure and API requirements, you will need to use a separate sheet within the DSbulkUploadR_input.xlsx file for each reference type you plan on creating. Supported reference types will have a sheet in the template file. You can leave entire sheets blank if you do not need that specific reference type.
 
-For instance, if you want to create 3,600 Audio Recordings references, you can do it all using the single AudioRecording sheet in the DSbulkUploadR_input.xlsx file. However, if you want to make 3,549 Audio Recording references and 51 Generic Document references, you will need to put the Audio Recording data in the AudioRecording sheet and the Generic Document data in the GenericDocument sheet of the DSbulkUploadR_input.xlsx file. You will also need to run the `generate_references()` function twice: once supplying the AudioRecording sheet and once supplying the GenericDocument sheet for the DSbulkdUploadR_input.xlsx file.
+For instance, if you want to create 3,600 Audio Recordings references, you can do it all using the single AudioRecording sheet in the DSbulkUploadR_input.xlsx file. However, if you want to make 3,549 Audio Recording references and 51 Generic Document references, you will need to put the Audio Recording data in the AudioRecording sheet and the Generic Document data in the GenericDocument sheet of the DSbulkUploadR_input.xlsx file. You will also need to run the `generate_references()` function twice: once supplying with the `sheet` parameter set to "AudioRecording" and a second time with `sheet = "GenericDocument"`. You can use a single for the DSbulkdUploadR_input.xlsx file for both sheets.

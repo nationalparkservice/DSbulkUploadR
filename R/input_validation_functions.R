@@ -1086,7 +1086,7 @@ check_content_units <- function(path = getwd(),
     # access all park codes from NPS xml file
     curl::curl_download("https://irmaservices.nps.gov/Unit/v2/api/", f)
   }
-  result <- XML::xmlParse(file = f)
+  result <- XML::xmlParse(file = f, options =  XML::NOWARNING)
   dat <- XML::xmlToDataFrame(result)
 
   #check for bad conten units:

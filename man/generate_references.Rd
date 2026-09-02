@@ -8,6 +8,7 @@ generate_references(
   path = getwd(),
   filename = "DSbulkUploadR_input.xlsx",
   sheet,
+  activate_refs = FALSE,
   max_file_upload = 500,
   max_data_upload = 10,
   data_upload = TRUE,
@@ -21,6 +22,8 @@ generate_references(
 \item{filename}{String. The name of the file with information on what will be uploaded. Defaults to "DSbulkUploadR_input.xlsx". Must be an xlsx.}
 
 \item{sheet}{String. Name of the sheet within the .xlsx to read data from.}
+
+\item{activate_refs}{Logical. Should the references be set to active or left in draft status? Defaults to FALSE (draft status)}
 
 \item{max_file_upload}{Integer. The maximum allowable number of files to upload. Defaults to 500.}
 
